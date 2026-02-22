@@ -34,13 +34,7 @@ jobs:
           echo "Fetching tag $TAG from upstream..."
           git -c fetch.autoTags=false fetch upstream "refs/tags/${TAG}:refs/tags/${TAG}" --force
 
-          COMMIT=$(git rev-list -n 1 "$TAG")
-          echo "Tag $TAG points to commit $COMMIT"
-
-          echo "Updating master to $COMMIT..."
-          git push origin "${COMMIT}:refs/heads/master" --force
-
           echo "Pushing tag $TAG to fork..."
           git push origin "refs/tags/${TAG}:refs/tags/${TAG}" --force
 
-          echo "Sync complete: $TAG -> fork master + tag"
+          echo "Sync complete: tag $TAG pushed to fork"
