@@ -31,7 +31,7 @@ jobs:
 
           git remote add upstream https://github.com/n8n-io/n8n.git
           echo "Fetching tag $TAG from upstream..."
-          git fetch upstream --no-tags "refs/tags/${TAG}:refs/tags/${TAG}"
+          git fetch upstream "refs/tags/${TAG}:refs/tags/${TAG}" --force
 
           COMMIT=$(git rev-list -n 1 "$TAG")
           echo "Tag $TAG points to commit $COMMIT"
