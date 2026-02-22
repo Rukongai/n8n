@@ -1,0 +1,40 @@
+name: Sync Upstream Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_tag:
+        description: 'Upstream tag to sync (e.g. n8n@1.80.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch upstream tag and sync to fork
+        run: |
+          TAG="${{ inputs.target_tag }}"
+
+          git remote add upstream https://github.com/n8n-io/n8n.git
+          echo "Fetching tag $TAG from upstream..."
+          git fetch upstream "refs/tags/${TAG}:refs/tags/${TAG}" --force
+
+          COMMIT=$(git rev-list -n 1 "$TAG")
+          echo "Tag $TAG points to commit $COMMIT"
+
+          echo "Updating master to $COMMIT..."
+          git push origin "${COMMIT}:refs/heads/master" --force
+
+          echo "Pushing tag $TAG to fork..."
+          git push origin "refs/tags/${TAG}:refs/tags/${TAG}" --force
+
+          echo "Sync complete: $TAG -> fork master + tag"
