@@ -9,7 +9,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   sync:
@@ -24,9 +24,14 @@ jobs:
         run: |
           TAG="${{ inputs.target_tag }}"
 
+          # Configure push to use PAT with workflow scope so upstream
+          # .github/workflows/ changes are accepted
+          git remote set-url origin \
+            "https://x-access-token:${{ secrets.WORKFLOW_TOKEN }}@github.com/${{ github.repository }}.git"
+
           git remote add upstream https://github.com/n8n-io/n8n.git
           echo "Fetching tag $TAG from upstream..."
-          git fetch upstream "refs/tags/${TAG}:refs/tags/${TAG}" --force
+          git fetch upstream --no-tags "refs/tags/${TAG}:refs/tags/${TAG}"
 
           COMMIT=$(git rev-list -n 1 "$TAG")
           echo "Tag $TAG points to commit $COMMIT"
